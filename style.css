@@ -134,7 +134,7 @@ body {
   border: none;
   background-color: transparent; /* Можно регулировать при необходимости */
 
-  background-image: url("./../img/icons/delete.svg");
+  background-image: url("./img/icons/delete.svg");
   background-position: center; /* Центрование */
   background-size: contain; /* Изменяем размер изображения в зависимости от кнопки */
   background-repeat: no-repeat;
