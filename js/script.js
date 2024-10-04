@@ -14,7 +14,7 @@ let data = App.loadLS();
 
 if (data) {
   data.forEach((columns) => {
-    Column.process(columns.id, columns.title, columns.notes);
+    new Column(columns.id, columns.title, columns.notes);
   });
 }
 
@@ -22,6 +22,12 @@ if (data) {
 document
   .querySelector("[data-action-addcolumn]")
   .addEventListener("click", function () {
-    Column.process();
+    new Column();
     App.saveLS();
   });
+
+const btnDelete = document.querySelector(".delete");
+
+btnDelete.addEventListener("drop", function (e) {
+  console.log("drop");
+});

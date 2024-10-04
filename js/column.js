@@ -1,13 +1,8 @@
 import App from "./application.js";
 import Note from "./note.js";
 
-const Column = {
-  draggedColumn: null,
-  droppedColumn: null,
-  lastId: 0,
-
-  // манипуляции внутри колонки
-  process(id = null, title = "", notes = []) {
+export default class Column {
+  constructor(id = null, title = "", notes = []) {
     let res;
     if (title.length > 0) {
       res = title;
@@ -26,7 +21,7 @@ const Column = {
     }
 
     // создание колонки
-    const column = document.createElement("div");
+    const column = (this.column = document.createElement("div"));
     column.classList.add("column");
     column.setAttribute("draggable", "true");
     column.setAttribute("data-column-id", Column.lastId);
@@ -41,9 +36,9 @@ const Column = {
     // создание notes (если есть данные)
     if (notes.length > 0) {
       notes.forEach((note) => {
-        let noteElement = Note.createNote(note.id, note.info);
+        let noteElement = new Note(note.id, note.info);
         let dataNotes = column.querySelector("[data-notes]");
-        dataNotes.append(noteElement);
+        dataNotes.append(noteElement.note);
       });
     }
 
@@ -52,11 +47,12 @@ const Column = {
 
     spanAdd.addEventListener("click", function (e) {
       let dataNotes = e.target.closest(".column").querySelector("[data-notes]");
-      let note = Note.createNote();
+      let note = new Note();
 
-      dataNotes.append(note);
-      note.setAttribute("contenteditable", "true");
-      note.focus();
+      if (note.note) {
+        dataNotes.append(note.note);
+        note.note.setAttribute("contenteditable", "true");
+      }
 
       // cохраняем полученные данные в LS
       App.saveLS();
@@ -77,18 +73,18 @@ const Column = {
     });
 
     // перетаскивание колонок
-    column.addEventListener("dragstart", Column.dragstart);
-    column.addEventListener("dragend", Column.dragend);
-    column.addEventListener("dragover", Column.dragover);
-    column.addEventListener("drop", Column.drop);
+    this.column.addEventListener("dragstart", this.dragstart.bind(this));
+    this.column.addEventListener("dragend", this.dragend.bind(this));
+    this.column.addEventListener("dragover", this.dragover.bind(this));
+    this.column.addEventListener("drop", this.drop.bind(this));
 
     document.querySelector(".columns").appendChild(column);
-  },
+  }
 
   dragstart(e) {
     e.stopPropagation();
-    Column.draggedColumn = this;
-    this.classList.add("dragged");
+    Column.draggedColumn = this.column;
+    this.column.classList.add("dragged");
 
     document
       .querySelectorAll(".note")
@@ -97,12 +93,12 @@ const Column = {
     document
       .querySelectorAll(".column")
       .forEach((column) => column.classList.remove("drop"));
-  },
+  }
 
   dragend() {
     Column.draggedColumn = null;
     Column.droppedColumn = null;
-    this.classList.remove("dragged");
+    this.column.classList.remove("dragged");
 
     document
       .querySelectorAll(".note")
@@ -111,54 +107,58 @@ const Column = {
     document
       .querySelectorAll(".column")
       .forEach((column) => column.classList.remove("under"));
-  },
+
+    App.saveLS();
+  }
 
   dragover(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (Column.draggedColumn === this) {
+    if (Column.draggedColumn === this.column) {
       if (Column.droppedColumn) {
         Column.droppedColumn.classList.add(".under");
       }
       Column.droppedColumn = null;
     }
-    if (!Column.draggedColumn || Column.draggedColumn === this) {
+    if (!Column.draggedColumn || Column.draggedColumn === this.column) {
       return;
     }
 
-    Column.droppedColumn = this;
+    Column.droppedColumn = this.column;
     document
       .querySelectorAll(".column")
       .forEach((column) => column.classList.remove("under"));
 
-    this.classList.add(".under");
-  },
+    this.column.classList.add(".under");
+  }
 
   drop(e) {
     if (Note.draggedNote) {
-      return this.querySelector(".data-notes").append(Note.draggedNote);
-    } else if (!Column.draggedColumn || Column.draggedColumn === this) {
+      return this.column.querySelector(".data-notes").append(Note.draggedNote);
+    } else if (!Column.draggedColumn || Column.draggedColumn === this.column) {
       return;
     }
 
     const columnsList = Array.from(document.querySelectorAll(".column"));
-    const indexA = columnsList.indexOf(this);
+    const indexA = columnsList.indexOf(this.column);
     const indexB = columnsList.indexOf(Column.draggedColumn);
 
     if (indexA < indexB) {
-      this.parentElement.insertBefore(Column.draggedColumn, this);
+      this.column.parentElement.insertBefore(Column.draggedColumn, this.column);
     } else {
-      this.parentElement.insertBefore(
+      this.column.parentElement.insertBefore(
         Column.draggedColumn,
-        this.nextElementSibling
+        this.column.nextElementSibling
       );
     }
 
     document
       .querySelectorAll(".column")
       .forEach((column) => column.classList.remove("under"));
-  },
-};
+  }
+}
 
-export default Column;
+Column.draggedColumn = null;
+Column.droppedColumn = null;
+Column.lastId = 0;

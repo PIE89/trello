@@ -8,6 +8,7 @@ body {
 }
 
 .container {
+  position: relative;
   height: 100vh;
   padding: 10px;
   margin: 10px;
@@ -122,4 +123,25 @@ body {
 
 .note.under {
   opacity: 0.5;
+}
+
+.delete {
+  position: absolute;
+  bottom: 10%;
+  right: 10%;
+  width: 100px; /* Увеличено для лучшей видимости */
+  height: 100px; /* Увеличено для лучшей видимости */
+  border: none;
+  background-color: transparent; /* Можно регулировать при необходимости */
+
+  background-image: url("./../img/icons/delete.svg");
+  background-position: center; /* Центрование */
+  background-size: contain; /* Изменяем размер изображения в зависимости от кнопки */
+  background-repeat: no-repeat;
+
+  transition: all 0.2s ease-in;
+}
+
+.delete:hover {
+  opacity: 0.8;
 }
