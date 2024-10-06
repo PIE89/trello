@@ -26,8 +26,22 @@ document
     App.saveLS();
   });
 
+// Получаем элемент с классом .delete, который будет использоваться для удаления.
 const btnDelete = document.querySelector(".delete");
 
-btnDelete.addEventListener("drop", function (e) {
-  console.log("drop");
+// Добавляем обработчик события 'dragover' на элемент btnDelete.
+// Это событие срабатывает, когда объект перетаскивается над элементом.
+btnDelete.addEventListener("dragover", (event) => {
+  // Отключаем поведение по умолчанию для события 'dragover'.
+  // Без этого браузер не разрешит сбрасывать перетаскиваемый объект.
+  event.preventDefault();
+});
+
+// Добавляем обработчик события 'drop' на элемент btnDelete.
+// Это событие срабатывает, когда объект сбрасывается на элемент.
+btnDelete.addEventListener("drop", function (event) {
+  // Отключаем поведение по умолчанию для события 'drop'.
+  event.preventDefault();
+
+  Column.draggedColumn.remove();
 });
